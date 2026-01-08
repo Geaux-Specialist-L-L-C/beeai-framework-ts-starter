@@ -35,6 +35,33 @@ To run an agent with a custom prompt, simply do this `npm run start src/agent.ts
 >
 > To use Bee agent with [OpenInference Instrumentation for BeeAI](https://github.com/Arize-ai/openinference/tree/main/js/packages/openinference-instrumentation-beeai) refer to the [Observability](#observability) section.
 
+## Cloud Run build mode
+
+Local commands:
+
+```
+npm ci --legacy-peer-deps
+npm run build
+PORT=8080 npm start
+```
+
+```
+curl http://localhost:8080/health
+```
+
+Docker commands:
+
+```
+docker build -t beeai-orchestration .
+docker run -p 8080:8080 -e PORT=8080 beeai-orchestration
+```
+
+```
+curl http://localhost:8080/health
+```
+
+Note: the container disables Husky via `HUSKY=0`.
+
 ## 🏗 Infrastructure
 
 > [!NOTE]
