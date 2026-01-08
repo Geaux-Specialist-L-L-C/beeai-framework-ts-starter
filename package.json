@@ -21,9 +21,9 @@
     "url": "https://github.com/i-am-bee/beeai-framework-starter/issues"
   },
   "scripts": {
-    "start": "npm exec tsx",
+    "start": "node dist/server.js",
     "ts:check": "tsc --noEmit --project tsconfig.json",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc -p tsconfig.server.json",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --check .",
