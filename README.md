@@ -49,6 +49,22 @@ PORT=8080 npm start
 curl http://localhost:8080/health
 ```
 
+```
+curl http://localhost:8080/probe/llm
+```
+
+```
+curl -X POST http://localhost:8080/api/assessment/vark/start \
+  -H "content-type: application/json" \
+  -d '{"studentId":"demo-123","gradeBand":"6-8"}'
+```
+
+```
+curl -X POST http://localhost:8080/api/assessment/vark/respond \
+  -H "content-type: application/json" \
+  -d '{"sessionId":"<session-id>","answer":"A"}'
+```
+
 Docker commands:
 
 ```
@@ -60,7 +76,7 @@ docker run -p 8080:8080 -e PORT=8080 beeai-orchestration
 curl http://localhost:8080/health
 ```
 
-Note: the container disables Husky via `HUSKY=0`.
+Note: Docker builds set `CI=1` and `HUSKY=0` to disable Husky hooks.
 
 ## 🏗 Infrastructure
 
