@@ -8,6 +8,7 @@ export interface VarkScores {
   r: number;
   k: number;
 }
+const MODALITIES: readonly VarkModality[] = ["V", "A", "R", "K"];
 export interface VarkOption {
   key: "A" | "B" | "C" | "D";
   text: string;
@@ -214,12 +215,20 @@ export function summarizeProfile(scores: VarkScores): {
   summary: string;
   recommendations: string[];
 } {
-  const entries: { key: VarkModality; score: number }[] = [
-    { key: "V", score: scores.v },
-    { key: "A", score: scores.a },
-    { key: "R", score: scores.r },
-    { key: "K", score: scores.k },
-  ].sort((a, b) => b.score - a.score);
+  const entries: { key: VarkModality; score: number }[] = MODALITIES.map((key) => {
+    switch (key) {
+      case "V":
+        return { key, score: scores.v };
+      case "A":
+        return { key, score: scores.a };
+      case "R":
+        return { key, score: scores.r };
+      case "K":
+        return { key, score: scores.k };
+      default:
+        return { key, score: 0 };
+    }
+  }).sort((a, b) => b.score - a.score);
 
   const top = entries[0];
   const second = entries[1];
