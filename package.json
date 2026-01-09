@@ -42,6 +42,7 @@
     "@opentelemetry/sdk-node": "^0.57.0",
     "beeai-framework": "^0.1.23",
     "dotenv": "^16.4.5",
+    "pino-pretty": "^11.2.2",
     "pino": "^9.4.0",
     "zod": "^3.24.2"
   },
@@ -54,7 +55,6 @@
     "eslint-config-prettier": "^8.10.2",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
-    "pino-pretty": "^11.2.2",
     "prettier": "^3.3.3",
     "rimraf": "^5.0.10",
     "tsx": "^4.19.1",
