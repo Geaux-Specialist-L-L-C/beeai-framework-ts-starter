@@ -53,6 +53,8 @@ curl http://localhost:8080/health
 curl http://localhost:8080/probe/llm
 ```
 
+Note: For Cloud Run + Vertex, `@ai-sdk/google-vertex` must be a production dependency because BeeAI loads it at runtime.
+
 ```
 curl -X POST http://localhost:8080/api/assessment/vark/start \
   -H "content-type: application/json" \
