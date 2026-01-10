@@ -1,43 +1,36 @@
-# 🐝 BeeAI Framework Starter
+# VARK Assessment Orchestration Service
 
-This starter template lets you quickly start working with the [BeeAI Framework](https://github.com/i-am-bee/beeai-framework) in a second.
+This service runs the VARK assessment API for Geaux Academy. It provides a minimal HTTP API for starting a session, collecting responses, and returning the VARK profile summary. The service is designed for Cloud Run deployments.
 
-📚 See the [documentation](https://i-am-bee.github.io/beeai-framework/) to learn more.
+## What this service does
 
-## ✨ Key Features
+- Orchestrates VARK assessment sessions.
+- Probes the configured LLM to ensure Vertex configuration is healthy.
+- Stores sessions in Firestore when a project is configured, or falls back to in-memory storage for local development.
 
-- 🔒 Safely execute an arbitrary Python Code via [Bee Code Interpreter](https://github.com/i-am-bee/bee-code-interpreter).
-- 🔎 Get complete visibility into agents' decisions using our [OpenInference Instrumentation for BeeAI](https://github.com/Arize-ai/openinference/tree/main/js/packages/openinference-instrumentation-beeai) package.
-- 🚀 Fully fledged TypeScript project setup with linting and formatting.
+## Endpoints
 
-## 📦 Requirements
+- `GET /health`
+- `GET /probe/llm`
+- `POST /api/assessment/vark/start`
+- `POST /api/assessment/vark/respond`
 
-- JavaScript runtime [NodeJS > 18](https://nodejs.org/) (ideally installed via [nvm](https://github.com/nvm-sh/nvm)).
-- Container system like [Rancher Desktop](https://rancherdesktop.io/), [Podman](https://podman.io/) (VM must be rootfull machine) or [Docker](https://www.docker.com/).
-- LLM Provider either external [WatsonX](https://www.ibm.com/watsonx) (OpenAI, Groq, ...) or local [ollama](https://ollama.com).
+## Environment variables
 
-## 🛠️ Getting started
+Required:
 
-1. Clone this repository or [use it as a template](https://github.com/new?template_name=beeai-framework-starter&template_owner=i-am-bee).
-2. Install dependencies `npm ci`.
-3. Configure your project by filling in missing values in the `.env` file (default LLM provider is locally hosted `Ollama`).
-4. Run the agent `npm run start src/agent.ts`
+- `PORT` (default 8080)
+- `LLM_CHAT_MODEL_NAME` (Vertex model name used by `src/beeai/llm.ts`)
+- `VERTEX_REGION` or `VERTEX_LOCATION`
+- `GOOGLE_CLOUD_PROJECT` (or `FIREBASE_PROJECT_ID` if using Firestore only)
 
-To run an agent with a custom prompt, simply do this `npm run start src/agent.ts <<< 'Hello Bee!'`
+Optional:
 
-🧪 More examples can be found [here](https://github.com/i-am-bee/beeai-framework/blob/main/examples).
+- `FIREBASE_PROJECT_ID` (if you want to force Firestore usage without `GOOGLE_CLOUD_PROJECT`)
 
-> [!TIP]
->
-> To use Bee agent with [Python Code Interpreter](https://github.com/i-am-bee/bee-code-interpreter) refer to the [Code Interpreter](#code-interpreter) section.
+You must also configure application default credentials for Vertex/Firestore in Cloud Run.
 
-> [!TIP]
->
-> To use Bee agent with [OpenInference Instrumentation for BeeAI](https://github.com/Arize-ai/openinference/tree/main/js/packages/openinference-instrumentation-beeai) refer to the [Observability](#observability) section.
-
-## Cloud Run build mode
-
-Local commands:
+## Local build/run
 
 ```
 npm ci --legacy-peer-deps
@@ -45,15 +38,9 @@ npm run build
 PORT=8080 npm start
 ```
 
-```
-curl http://localhost:8080/health
-```
+## Example requests
 
-```
-curl http://localhost:8080/probe/llm
-```
-
-Note: For Cloud Run + Vertex, `@ai-sdk/google-vertex` must be a production dependency because BeeAI loads it at runtime.
+Start a session:
 
 ```
 curl -X POST http://localhost:8080/api/assessment/vark/start \
@@ -61,70 +48,26 @@ curl -X POST http://localhost:8080/api/assessment/vark/start \
   -d '{"studentId":"demo-123","gradeBand":"6-8"}'
 ```
 
+Respond to a question:
+
 ```
 curl -X POST http://localhost:8080/api/assessment/vark/respond \
   -H "content-type: application/json" \
   -d '{"sessionId":"<session-id>","answer":"A"}'
 ```
 
-Docker commands:
+Probe LLM:
 
 ```
-docker build -t beeai-orchestration .
-docker run -p 8080:8080 -e PORT=8080 beeai-orchestration
+curl http://localhost:8080/probe/llm
 ```
 
-```
-curl http://localhost:8080/health
-```
+## Troubleshooting
 
-Note: Docker builds set `CI=1` and `HUSKY=0` to disable Husky hooks.
+- **LLM probe failed**: Verify `LLM_CHAT_MODEL_NAME`, `VERTEX_REGION`/`VERTEX_LOCATION`, and the project ID env var. Make sure Cloud Run has Vertex permissions.
+- **Session not found**: Ensure you are sending the latest `sessionId` from `/start` and that Firestore connectivity is healthy.
+- **Missing env vars**: The service returns 500 errors when required env vars are absent. Check Cloud Run service configuration.
 
-## 🏗 Infrastructure
+## More documentation
 
-> [!NOTE]
->
-> Docker distribution with support for _compose_ is required, the following are supported:
->
-> - [Docker](https://www.docker.com/)
-> - [Rancher](https://www.rancher.com/) - macOS users may want to use VZ instead of QEMU
-> - [Podman](https://podman.io/) - requires [compose](https://podman-desktop.io/docs/compose/setting-up-compose) and **rootful machine** (if your current machine is rootless, please create a new one, also ensure you have enabled Docker compatibility mode).
-
-## 🔒Code interpreter
-
-The [Bee Code Interpreter](https://github.com/i-am-bee/bee-code-interpreter) is a gRPC service that an agent uses to execute an arbitrary Python code safely.
-
-### Instructions
-
-1. Start all services related to the [`Code Interpreter`](https://github.com/i-am-bee/bee-code-interpreter) `npm run infra:start --profile=code_interpreter`
-2. Run the agent `npm run start src/agent_code_interpreter.ts`
-
-> [!NOTE]
->
-> Code Interpreter runs on `http://127.0.0.1:50081`.
-
-## 🔎 Observability
-
-Get complete visibility of the agent's inner workings via [OpenInference Instrumentation for BeeAI](https://github.com/Arize-ai/openinference/tree/main/js/packages/openinference-instrumentation-beeai).
-
-### Instructions
-
-> Please use node version >= 20 to run this example.
-
-1. (Optional) In order to see spans in [Phoenix](https://github.com/Arize-ai/phoenix), begin running a Phoenix server. This can be done in one command using docker.
-
-```
-docker run -p 6006:6006 -i -t arizephoenix/phoenix
-```
-
-or via the command line:
-
-```
-brew install i-am-bee/beeai/arize-phoenix
-brew services start arize-phoenix
-```
-
-see https://docs.beeai.dev/observability/agents-traceability for more details.
-
-2. Run the agent `npm run start src/agent_observe.ts`
-3. You should see your spans exported in your console. If you've set up a locally running Phoenix server, head to [**localhost:6006**](http://localhost:6006/projects) to see your spans.
+See `docs/VARK_ORCHESTRATION_SERVICE.md` for detailed operational notes and troubleshooting steps.

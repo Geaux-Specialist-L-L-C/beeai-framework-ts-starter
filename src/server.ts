@@ -257,23 +257,6 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Minimal JSON handler for POST /vark/run
-  if (req.method === "POST" && path === "/vark/run") {
-    try {
-      const parsed = await readJson(req);
-      const out = {
-        sessionId: parsed.sessionId ?? randomUUID(),
-        memory: parsed.memory ?? {},
-        output: { ok: true },
-      };
-      sendJson(res, 200, out);
-    } catch (e: any) {
-      const status = typeof e?.statusCode === "number" ? e.statusCode : 400;
-      sendJson(res, status, { error: e?.message ?? "bad request" });
-    }
-    return;
-  }
-
   sendText(res, 404, "not found");
 });
 
