@@ -10,8 +10,7 @@
   "files": [
     "dist/**/*"
   ],
-  "main": "./dist/agent.js",
-  "types": "./dist/agent.d.ts",
+  "main": "./dist/server.js",
   "homepage": "https://github.com/i-am-bee/beeai-framework-starter#readme",
   "repository": {
     "type": "git",
@@ -24,6 +23,7 @@
     "start": "node dist/server.js",
     "ts:check": "tsc --noEmit --project tsconfig.json",
     "build": "rimraf dist && tsc -p tsconfig.server.json",
+    "test": "node --test tests/vark.smoke.test.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --check .",
@@ -37,13 +37,8 @@
   },
   "dependencies": {
     "@ai-sdk/google-vertex": "^3.0.97",
-    "@arizeai/openinference-instrumentation-beeai": "^1.4.2",
     "@google-cloud/firestore": "^7.11.6",
-    "@opentelemetry/sdk-node": "^0.57.0",
     "beeai-framework": "^0.1.23",
-    "dotenv": "^16.4.5",
-    "pino-pretty": "^11.2.2",
-    "pino": "^9.4.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
